@@ -1,0 +1,5 @@
+imu_topic: "/imu/data"
+mag_topic: "/mag"
+imu_rate: 200
+measure_rate: 200 # Rate to which imu data is subsampled
+sequence_time: 42874 # 3 hours in seconds

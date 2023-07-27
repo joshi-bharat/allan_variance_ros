@@ -49,9 +49,17 @@ struct AllanVarianceFormat {
   double gyroY;
   double gyroZ;
 
+  double mag_x = -1.0;
+  double mag_y = -1.0;
+  double mag_z = -1.0;
+
   void writeOnFile(std::ofstream& file) {
     file << std::setprecision(19) << period << std::setprecision(7) << " " << accX << " " << accY << " " << accZ << " "
-         << gyroX << " " << gyroY << " " << gyroZ << " " << std::endl;
+         << gyroX << " " << gyroY << " " << gyroZ;
+    if (mag_x > 0) {
+      file << " " << mag_x << " " << mag_y << " " << mag_z;
+    }
+    file << " " << std::endl;
   }
 };
 
@@ -59,12 +67,12 @@ class AllanVarianceComputor {
  public:
   AllanVarianceComputor(ros::NodeHandle& nh, std::string config_file, std::string output_path);
 
-  virtual ~AllanVarianceComputor() {closeOutputs();}
+  virtual ~AllanVarianceComputor() { closeOutputs(); }
 
   void run(std::string bag_path);
   void closeOutputs();
   void allanVariance();
-  void writeAllanDeviation(std::vector<double> variance, double period);
+  void writeAllanDeviation(std::vector<double> deviation, double period, std::vector<double> magnetic_deviation = {});
 
  private:
   // ROS
@@ -87,7 +95,11 @@ class AllanVarianceComputor {
   uint64_t lastImuTime_{};
   uint64_t firstTime_{};
   EigenVector<ImuMeasurement> imuBuffer_;
+
+  EigenVector<MagneticMeasurement> mag_buffer_;
+  bool calculate_mag_ = false;
+
   bool firstMsg_;
-  float overlap_; // Percent to overlap bins
+  float overlap_;  // Percent to overlap bins
 };
 }  // namespace allan_variance_ros
